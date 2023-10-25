@@ -1,15 +1,17 @@
 #ifndef _FACTORY_H_
 #define _FACTORY_H_
+#include <iostream>
 
 class Factory{
 public:    
-    Factory();
-    Factory(const Factory&);
-    virtual ~Factory() = 0;
 
-    virtual void Print() const;
-    virtual void Save()  const;
-    virtual void Load();
+    Factory(){}
+    virtual ~Factory() {};
+
+    virtual void Print()              const = 0;
+    virtual void Save(std::ostream&)  const = 0;
+    virtual void Load(std::istream&)        = 0;
+    virtual bool Menu()                     = 0;
 protected:
 
 
