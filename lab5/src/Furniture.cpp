@@ -82,34 +82,36 @@ void Furniture::SetMaterial(const std::string &sMaterial) {
 
 void Furniture::Save(std::ostream& os) const {
     os << "Furniture:\n";
-    os << "type:" << m_Type << "\n";
-    os << "size:" << m_nSize[0] << " " << m_nSize[1] << " " << m_nSize[2] << "\n";
-    os << "color:" << m_sColor << "\n";
-    os << "material:" << m_sMaterial << "\n";
-    os << "price:" << m_fPrice << "\n";
+    os << "type: " << m_Type << "\n";
+    os << "size: " << m_nSize[0] << " " << m_nSize[1] << " " << m_nSize[2] << "\n";
+    os << "color: " << m_sColor << "\n";
+    os << "material: " << m_sMaterial << "\n";
+    os << "price: " << m_fPrice << "\n";
+    os << "end\n\n";
     std::cout << "Furniture saved successfully.\n";
 }
 
 void Furniture::Load(std::istream& is) {
-    std::string line;
-    while (std::getline(is, line)) {
-        size_t pos = line.find(':');
-        std::string key = line.substr(0, pos);
-        std::string value = line.substr(pos + 1);
-        if (key == "type") {
+    while (!is.eof()) {
+        std::string key, value;
+        is >> key;
+        if(key == "end")
+            break;
+        is >> value;
+        if (key == "type:") {
             m_Type = (TYPE)std::stoi(value);
         }
-        else if (key == "size") {
-            std::stringstream ss(value);
-            ss >> m_nSize[0] >> m_nSize[1] >> m_nSize[2];
+        else if (key == "size:") {
+            m_nSize[0] = std::stof(value);
+            is >> m_nSize[1] >> m_nSize[2];
         }
-        else if (key == "color") {
+        else if (key == "color:") {
             m_sColor = value;
         }
-        else if (key == "material") {
+        else if (key == "material:") {
             m_sMaterial = value;
         }
-        else if (key == "price") {
+        else if (key == "price:") {
             m_fPrice = std::stof(value);
         }
     }

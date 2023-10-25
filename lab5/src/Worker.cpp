@@ -69,33 +69,35 @@ float Worker::GetSalary() const {
 
 void Worker::Save(std::ostream& os) const {
     os << "Worker:\n";
-    os << "name:" << m_sName << "\n";
-    os << "job_title:" << m_sJobTitle << "\n";
-    os << "address:" << m_sAdress << "\n";
-    os << "phone_number:" << m_sPhoneNumber << "\n";
-    os << "salary:" << m_fSalary << "\n";
+    os << "name: " << m_sName << "\n";
+    os << "job_title: " << m_sJobTitle << "\n";
+    os << "address: " << m_sAdress << "\n";
+    os << "phone_number: " << m_sPhoneNumber << "\n";
+    os << "salary: " << m_fSalary << "\n";
+    os << "end\n\n";
     std::cout << "Worker saved successfully.\n";
 }
 
 void Worker::Load(std::istream& is) {
-    std::string line;
-    while (std::getline(is, line)) {
-        size_t pos = line.find(':');
-        std::string key = line.substr(0, pos);
-        std::string value = line.substr(pos + 1);
-        if (key == "name") {
+    while (!is.eof()) {
+        std::string key, value;
+        is >> key;
+        if(key == "end")
+            break;
+        is >> value;
+        if (key == "name:") {
             m_sName = value;
         }
-        else if (key == "job_title") {
+        else if (key == "job_title:") {
             m_sJobTitle = value;
         }
-        else if (key == "address") {
+        else if (key == "address:") {
             m_sAdress = value;
         }
-        else if (key == "phone_number") {
+        else if (key == "phone_number:") {
             m_sPhoneNumber = value;
         }
-        else if (key == "salary") {
+        else if (key == "salary:") {
             m_fSalary = std::stof(value);
         }
     }
@@ -104,8 +106,7 @@ void Worker::Load(std::istream& is) {
 
 bool Worker::Menu() {
     int choice;
-    bool exit = false;
-    while (!exit) {
+    while (1) {
         std::cout << "1. Print worker information\n";
         std::cout << "2. Set worker name\n";
         std::cout << "3. Set worker job title\n";

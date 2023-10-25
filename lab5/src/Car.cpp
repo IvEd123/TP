@@ -39,21 +39,23 @@ void Car::SetModel(const std::string &sModel){
 
 void Car::Save(std::ostream& os) const {
     os << "Car:\n";
-    os << "model:" << m_sModel << "\n";
-    os << "number_plate:" << m_sNumberPlate << "\n";
+    os << "model: " << m_sModel << "\n";
+    os << "number_plate: " << m_sNumberPlate << "\n";
+    os << "end\n\n";
     std::cout << "Car saved successfully.\n";
 }
 
 void Car::Load(std::istream& is) {
-    std::string line;
-    while (std::getline(is, line)) {
-        size_t pos = line.find(':');
-        std::string key = line.substr(0, pos);
-        std::string value = line.substr(pos + 1);
-        if (key == "model") {
+    while (!is.eof()) {
+        std::string key, value;
+        is >> key;
+        if(key == "end")
+            break;
+        is >> value;
+        if (key == "model:") {
             m_sModel = value;
         }
-        else if (key == "number_plate") {
+        else if (key == "number_plate:") {
             m_sNumberPlate = value;
         }
     }
