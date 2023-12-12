@@ -1,0 +1,9 @@
+Car:
+model: bmw1
+number_plate: 123
+end
+
+Worker:
+name: ivan
+end
+end
