@@ -1,9 +1,9 @@
-Car:
-model: bmw1
-number_plate: 123
+name: test
+job_title: test2
+ye: 2020
 end
-
-Worker:
 name: ivan
+job_title: test
+ye: 1000
 end
 end

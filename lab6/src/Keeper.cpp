@@ -81,6 +81,7 @@ void Keeper::Save(const std::string& filename) {
         buffer = buffer->next;
     }
     buffer->obj.Save(file);
+	file << "end\n";
     m_pLast = nullptr;
     m_pFirst = nullptr;
     m_nCounter = 0;
@@ -94,11 +95,13 @@ Keeper Keeper::Load(const std::string& filename) {
 		throw std::runtime_error("Cant open file");
 
     std::string line;
-    while (getline(file, line)) {
+    while (!file.eof()) {
         Worker obj;
-        obj.Load(file);
-        keeper.Push(obj);
-        m_nCounter++;
+        if(obj.Load(file))
+        	keeper.Push(obj);
+		else
+			break;
+       // m_nCounter++;
     }
     file.close();
     return keeper;
@@ -156,7 +159,7 @@ void Keeper::Remove() {
 		buffer = buffer->next;
 	}
     do{
-        if(index == -1){
+        if(index != -1){
             std::cout << "Incorrect index\n";
         }
 	    std::cout << "Enter entity index: ";
@@ -200,7 +203,7 @@ void Keeper::Redact(){
 		buffer = buffer->next;
 	}
     do{
-        if(index == -1){
+        if(index != -1){
             std::cout << "Incorrect index\n";
         }
 	    std::cout << "Enter entity index: ";

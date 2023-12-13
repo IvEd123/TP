@@ -49,20 +49,21 @@ int Worker::GetEntryYear() const {
 }
 
 void Worker::Save(std::ostream& os) const {
-    os << "Worker:\n";
     os << "name: " << m_sName << "\n";
     os << "job_title: " << m_sJobTitle << "\n";
     os << "ey: " << m_nEntryYear << "\n";
-    os << "end\n\n";
+    os << "end\n";
     std::cout << "Worker saved successfully.\n";
 }
 
-void Worker::Load(std::istream& is) {
+bool Worker::Load(std::istream& is) {
+    bool bLoaded = false;
     while (!is.eof()) {
         std::string key, value;
         is >> key;
         if(key == "end")
             break;
+        bLoaded |= true;
         is >> value;
         if (key == "name:") {
             m_sName = value;
@@ -74,7 +75,9 @@ void Worker::Load(std::istream& is) {
             m_nEntryYear = std::stoi(value);
         }
     }
-    std::cout << "Worker loaded successfully.\n";
+    if(bLoaded)
+        std::cout << "Worker loaded successfully.\n";
+    return bLoaded;
 }
 
 

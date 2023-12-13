@@ -12,7 +12,7 @@ public:
 
     void        Print()             const;
     void        Save(std::ostream&) const;
-    void        Load(std::istream&);
+    bool        Load(std::istream&);
     bool        Menu();
         
     void        SetJobTitle(    const std::string& sJobTitle);

@@ -1,12 +1,30 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include "Keeper.h"
 #include "Worker.h"
 
-void task_2(std::string filename) {
+void task_2(const std::string& filename) {
+    std::vector<std::string> sentences;
+    std::ifstream file(filename);
+    if (!file.is_open())
+        return;
+    
+    std::string sentence;
+    while (getline(file, sentence, '.'))
+    {
+        sentence += '.';
+        if( sentence.find(",") == std::string::npos)
+            break;
+        sentences.push_back(sentence);
+    }
+    file.close();
 
+
+    for (int i = 0; i  <= sentences.size() - 1; i++)
+        std::cout << sentences[i] << std::endl; 
 }
 
 
@@ -14,21 +32,18 @@ int main() {
     int choice;
 A:
     while (true) {
-        system("cls");
         std::cout << "Menu:" << std::endl;
         std::cout << "1. task 1" << std::endl;
         std::cout << "2. task 2" << std::endl;
         std::cout << "0. quit" << std::endl;
         std::cout << "> ";
         std::cin >> choice;
-        system("clear");
         switch (choice) {
         case 1: {
             Worker buffer;
             Keeper keeper;
             std::string filename = "";
             while (true) {
-                system("clear");
                 std::cout << "Menu task 1:"  << std::endl;
                 std::cout << "1. Add object" << std::endl;
                 std::cout << "2. Load "    	 << std::endl;
@@ -39,7 +54,6 @@ A:
                 std::cout << "0. Back"       << std::endl;
                 std::cout << "> ";
                 std::cin >> choice;
-                system("clear");
                 switch (choice) {
                 case 1:
                     std::cin >> buffer;
@@ -61,17 +75,14 @@ A:
 
                 case 4:
                     keeper.Print();
-                    system("pause");
                     break;
 
                 case 5:
                     keeper.Search();
-                    system("pause");
                     break;
 
                 case 6:
                     keeper.Remove();
-                    system("pause");
                     break;
 
                 case 0:
@@ -79,7 +90,6 @@ A:
 
                 default:
                     std::cout << "Choose correct option" << std::endl;
-                    system("pause");
 
                     break;
                 }
@@ -90,7 +100,6 @@ A:
             std::cout << "Enter file name: ";
             std::cin >> filename;
             task_2(filename);
-            system("pause");
             break;
         }
 
@@ -100,7 +109,6 @@ A:
 
         default: {
             std::cout << "Choose correct option" << std::endl;
-            system("pause");
             break;
         }
 
