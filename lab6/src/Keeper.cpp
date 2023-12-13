@@ -1,132 +1,227 @@
 #include "Keeper.h"
-
 #include <iostream>
 #include <fstream>
-
-#include "Furniture.h"
-#include "Worker.h"
-#include "Car.h"
-
-Keeper::Keeper(){
+Keeper::Keeper() {
+	m_pFirst    = nullptr;
+	m_pLast     = nullptr;
+    m_nCounter  = 0;
+}
+Keeper::~Keeper() {
 }
 
-Keeper::Keeper(int nCopacity){
-    ReallocBuff(nCopacity);
+bool Keeper::IsEmpty() const{
+	return m_pFirst == nullptr;
 }
 
-Keeper::Keeper(const Keeper &){
-
+void Keeper::Push(const Worker& obj) {
+	container* buffer = new container;
+	buffer->obj = obj;
+	if (IsEmpty()) {
+        m_pLast = buffer;
+		m_pFirst = buffer;
+		buffer->next = nullptr;
+		m_nCounter++;
+		return;
+	}
+	if (buffer->obj < m_pFirst->obj) {
+		buffer->next = m_pFirst;
+		m_pFirst = buffer;
+		m_nCounter++;
+		return;
+	}
+	if (m_pFirst == m_pLast) {
+		if(buffer->obj > m_pFirst->obj){
+			buffer->next = nullptr;
+			m_pLast = buffer;
+			m_pFirst->next = m_pLast;
+		}
+		else {
+			buffer->next = m_pFirst;
+			m_pFirst = buffer;
+		}
+		m_nCounter++;
+		return;
+	}
+	container* buffer_sort = m_pFirst;
+	while (buffer_sort->next != nullptr) {
+		if (buffer->obj > buffer_sort->next->obj) {
+			buffer_sort = buffer_sort->next;
+		}
+		else if (buffer->obj < buffer_sort->next->obj) {
+			buffer->next = buffer_sort->next;
+			buffer_sort->next = buffer;
+			m_nCounter++;
+			return;
+		}
+		else {
+			buffer->next = buffer_sort->next;
+			buffer_sort->next = buffer;
+			m_nCounter++;
+			return;
+		}
+	}
+	buffer->next = nullptr;
+	m_pLast->next = buffer;
+	m_pLast = buffer;
+	m_nCounter++;
 }
 
-Keeper::~Keeper(){
-    for(int i = 0; i < m_nSize; i++){
-        if(m_pObjectBuff[i]== nullptr)
-            continue;
-        delete m_pObjectBuff[i];
+void Keeper::Save(const std::string& filename) {
+	if (IsEmpty()) {
+		std::cout << "container is empty" << std::endl;
+		return;
+	}
+	std::ofstream file(filename);
+	if (!file.is_open())
+		throw std::runtime_error("cannot open file");
+		
+    container* buffer = m_pFirst;
+    while (buffer->next != nullptr) {
+        buffer->obj.Save(file);
+        buffer = buffer->next;
     }
-    delete m_pObjectBuff;
+    buffer->obj.Save(file);
+    m_pLast = nullptr;
+    m_pFirst = nullptr;
+    m_nCounter = 0;
+    file.close();
 }
 
-bool Keeper::Save(){
-    std::ofstream os;
-    os.open(m_sSaveFilePath);
-    if(!os){
-        std::cout << "Couldn't open file\n";
-        return false;
-    }
-    for(int i = 0; i < m_nSize; i++)
-        if(m_pObjectBuff[i])
-            m_pObjectBuff[i]->Save(os);
-    os << "end\n";
-    os.close();
-    return false;
-}
+Keeper Keeper::Load(const std::string& filename) {
+	Keeper keeper;
+	std::ifstream file(filename);
+	if (!file.is_open()) 
+		throw std::runtime_error("Cant open file");
 
-void Keeper::Load(){
-    std::ifstream is(m_sSaveFilePath);
-    if(!is){
-        std::cout << "Couldn't open file\n";
-        return;
+    std::string line;
+    while (getline(file, line)) {
+        Worker obj;
+        obj.Load(file);
+        keeper.Push(obj);
+        m_nCounter++;
     }
-    std::string sBuff;
-    Factory* pNewItem;
-    while (!is.eof()) {
-        is >> sBuff;
-        if(sBuff == "end")
-            return;
-        if(sBuff.empty()){
-            std::cout << "File is empty :(\n";
-            return;
-        }
-        if(sBuff == "Worker:") {
-            pNewItem = new Worker();
-        }
-        else if(sBuff == "Furniture:") {
-            pNewItem = new Furniture();
-        }
-        else if(sBuff == "Car:"){
-            pNewItem = new Car();
-        }
-        if(!pNewItem)
-            continue;
-        pNewItem->Load(is);
-        PushBack(pNewItem);
-    }
-    is.close();
-}
-
-bool Keeper::AddSaveFile(const std::string &sPath){
-    m_sSaveFilePath = sPath;
-    return false;
+    file.close();
+    return keeper;
 }
 
 void Keeper::Print() const{
-    for(int i = 0; i < m_nSize; i++)
-        if(m_pObjectBuff[i] != nullptr)
-            m_pObjectBuff[i]->Print();
-
+	if (IsEmpty()) {
+		std::cout << "container is empty" << std::endl;
+		return;
+	}
+	if (m_pFirst == m_pLast) {
+		std::cout << m_pFirst->obj;
+		return;
+	}
+	container* buffer = m_pFirst;
+	while (buffer != m_pLast) {
+		std::cout << buffer->obj;
+		buffer = buffer->next;
+	}
+	std::cout << buffer->obj;
 }
 
-void Keeper::PushBack(Factory *pObj){
-    if(pObj == nullptr)
-        throw "Tried to push null pointer\n";
-
-    if(m_nSize + 1 >= m_nCopacity) //alloc more memory if buffer is full
-        ReallocBuff(m_nCopacity * 1.5);
-    
-    m_pObjectBuff[m_nSize++] = pObj;
+void Keeper::Search() const{
+	int m_nCounter = 0;
+	int key_word;
+	std::cout << "Enter minimum work experience: ";
+	std::cin >> key_word;
+	std::cout << std::endl;
+	container* buffer = m_pFirst;
+	while (buffer->next != nullptr) {
+		if (2023 - buffer->obj.GetEntryYear() >= key_word) {
+			std::cout << buffer->obj << std::endl;
+			m_nCounter++;
+		}
+		buffer = buffer->next;
+	}
+	if (2023 - buffer->obj.GetEntryYear() >= key_word) {
+		std::cout << buffer->obj << std::endl;
+		m_nCounter++;
+	}
+	if (m_nCounter == 0) {
+		std::cout << "Container is empty" << std::endl;
+	}
 }
 
-void Keeper::operator+=(Factory*pObj){
-    PushBack(pObj);
+void Keeper::Remove() {
+	int index = -1;
+	if (IsEmpty()) {
+		std::cout << "Container is empty" << std::endl;
+		return;
+	};
+	container* buffer = m_pFirst;
+	for (int i = 0; i < m_nCounter; i++) {
+		std::cout << i + 1 << ". " << buffer->obj.GetName() << std::endl;
+		buffer = buffer->next;
+	}
+    do{
+        if(index == -1){
+            std::cout << "Incorrect index\n";
+        }
+	    std::cout << "Enter entity index: ";
+	    std::cin >> index;
+    }while(index > m_nCounter || index <= 0);
+
+	if (index == 1) {
+		buffer = m_pFirst;
+		m_pFirst = m_pFirst->next;
+		m_nCounter--;
+		return;
+	}
+	if (index == m_nCounter) {
+		buffer = m_pFirst;
+		while (buffer->next != m_pLast) buffer = buffer->next;
+		buffer->next = nullptr;
+		delete m_pLast;
+		m_pLast = buffer;
+		m_nCounter--;
+		return;
+	}
+	buffer = m_pFirst;
+	container* buffer_prev = m_pFirst;
+	for (int i = 1; i < index; i++) {
+		buffer_prev = buffer;
+		buffer = buffer->next;
+	}
+	buffer_prev->next = buffer->next;
+	m_nCounter--;
 }
 
-Factory& Keeper::operator[](int nIndex){
-    if(nIndex >= m_nSize || nIndex < 0)
-        throw "Invalid index\n";
-    
-    if(m_pObjectBuff[nIndex] == nullptr)
-        throw "Array error\n";
+void Keeper::Redact(){
+		int index = -1;
+	if (IsEmpty()) {
+		std::cout << "Container is empty" << std::endl;
+		return;
+	};
+	container* buffer = m_pFirst;
+	for (int i = 0; i < m_nCounter; i++) {
+		std::cout << i + 1 << ". " << buffer->obj.GetName() << std::endl;
+		buffer = buffer->next;
+	}
+    do{
+        if(index == -1){
+            std::cout << "Incorrect index\n";
+        }
+	    std::cout << "Enter entity index: ";
+	    std::cin >> index;
+    }while(index > m_nCounter || index <= 0);
 
-    return *m_pObjectBuff[nIndex];
-}
-
-int Keeper::GetSize() const
-{
-    return m_nSize;
-}
-
-void Keeper::ReallocBuff(int nNewCopacity){
-    Factory** pNewBuff = new Factory*[nNewCopacity];
-
-    if(m_nSize <= 0){
-        m_pObjectBuff = pNewBuff;
-        m_nCopacity = nNewCopacity;
-        return;
-    }
-
-    std::copy(&m_pObjectBuff[0], &m_pObjectBuff[m_nSize-1], pNewBuff);
-    delete m_pObjectBuff;
-    m_pObjectBuff = pNewBuff;
-    m_nCopacity = nNewCopacity;
+	if (index == 1) {
+		std::cout << "Enter new value: " << std::endl;
+		std::cin >> m_pFirst->obj;
+		return;
+	}
+	if (index == m_nCounter) {
+		std::cout << "Enter new value: ";
+		std::cin >> m_pLast->obj;
+		return;
+	}
+	buffer = m_pFirst;
+	for (int i = 1; i < index; i++) {
+		buffer = buffer->next;
+	}
+	std::cout << "Enter new value: ";
+	std::cin >> buffer->obj;
+	m_nCounter--;
 }

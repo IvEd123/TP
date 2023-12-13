@@ -10,10 +10,10 @@ public:
     Worker(const std::string& sName);
     ~Worker();
 
-    void        Print()                 const  override;
-    void        Save(std::ostream&)     const  override;
-    void        Load(std::istream&)            override;
-    bool        Menu()                         override;
+    void        Print()             const;
+    void        Save(std::ostream&) const;
+    void        Load(std::istream&);
+    bool        Menu();
         
     void        SetJobTitle(    const std::string& sJobTitle);
     void        SetName(        const std::string& sName);
@@ -22,6 +22,13 @@ public:
     std::string GetJobTitle()   const;
     std::string GetName()       const;
     int         GetEntryYear()  const;
+
+	friend std::ostream& operator << (std::ostream& os, const Worker&);
+
+	friend std::istream& operator >> (std::istream& in, Worker&);
+
+    bool operator<(Worker&) const;
+    bool operator>(Worker&) const;
 
 
 private:

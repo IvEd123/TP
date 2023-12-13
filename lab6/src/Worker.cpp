@@ -1,5 +1,6 @@
 #include "Worker.h"
-
+#include <fstream>
+#include <iostream>
 Worker::Worker() {
 }
 
@@ -43,7 +44,7 @@ std::string Worker::GetName() const {
     return m_sName;
 }
 
-void Worker::GetEntryYear() const {
+int Worker::GetEntryYear() const {
     return m_nEntryYear;
 }
 
@@ -76,50 +77,24 @@ void Worker::Load(std::istream& is) {
     std::cout << "Worker loaded successfully.\n";
 }
 
-bool Worker::Menu() {
-    int choice;
-    while (1) {
-        std::cout << "1. Print worker information\n";
-        std::cout << "2. Set worker name\n";
-        std::cout << "3. Set worker job title\n";
-        std::cout << "4. Set worker's entry year\n";
-        std::cout << "5. Exit\n";
-        std::cin >> choice;
-        switch (choice) {
-            case 1: 
-                this->Print();
-                break;
-            case 2:
-                {
-                    std::string name;
-                    std::cout << "Enter worker name: ";
-                    std::cin >> name;
-                    this->SetName(name);
-                }
-                break;
-            case 3: 
-                {
-                    std::string job_title;
-                    std::cout << "Enter worker job title: ";
-                    std::cin >> job_title;
-                    this->SetJobTitle(job_title);
-                }
-                break;
-            case 4: 
-                {
-                    int nEntryYear;
-                    std::cout << "Enter worker entry year: ";
-                    std::cin >> address;
-                    this->seten(address);
-                }
-                break;
-            case 7: 
-                return true;
-                break;
-            default: 
-                std::cout << "Invalid choice.\n";
-                return true;
-                break;
-        }
-    }
+
+
+bool Worker::operator<(Worker& worker) const{
+    return m_sName < worker.m_sName;
+}
+bool Worker::operator>(Worker& worker) const{
+    return m_sName > worker.m_sName;
+}
+
+std::ostream& operator << (std::ostream& os, const Worker& w){
+    os << w.m_sName << " " << w.m_sJobTitle << " " << w.m_nEntryYear << std::endl;
+}
+
+std::istream& operator >> (std::istream& is, Worker& w){
+    std::cout << "enter name: ";
+    is >> w.m_sName;
+    std::cout << "enter job title: ";
+    is >> w.m_sJobTitle;
+    std::cout << "enter entry year: ";
+    is >> w.m_nEntryYear;
 }

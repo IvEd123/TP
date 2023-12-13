@@ -1,5 +1,5 @@
-TARGET = Lab5
-DEBUG = -g
+TARGET = Lab6
+DEBUG = -g -w
 CC = g++
 
 PREF_SRC = ./src/
